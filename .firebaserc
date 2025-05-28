@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "my-snack-cd3cb",
+    "client-web": "my-snack-cd3cb"
+  },
+  "targets": {
+    "mysnack-97e3e": {
+      "hosting": {
+        "client-web-da80b": [
+          "client-web-da80b"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
