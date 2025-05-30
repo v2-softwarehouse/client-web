@@ -17,7 +17,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div className="p-4 pb-20">
       <Stores />
 
       {isModalVisible && <Order />}
@@ -32,6 +32,6 @@ export default function Home() {
           <p className="font-bold text-secondary">Fazer pedido</p>
         )}
       </div>
-    </>
+    </div>
   );
 }

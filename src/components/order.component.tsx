@@ -4,8 +4,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronCircleUp } from "@fortawesome/free-solid-svg-icons";
 
 export const Order = () => {
-  const { showForm, statusText, handleChangeName, handleCreateOrder } =
-    useOrder();
+  const {
+    showForm,
+    statusText,
+    handleChangeName,
+    handleCreateOrder,
+    userName,
+  } = useOrder();
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-end items-end">
@@ -32,6 +37,7 @@ export const Order = () => {
               type="text"
               required
               disabled={!showForm}
+              value={userName}
               placeholder="Digite..."
               onChange={(e) => handleChangeName(e.target.value)}
             />

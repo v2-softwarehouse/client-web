@@ -20,6 +20,7 @@ export const useOrder = () => {
       if (orderKey) {
         setShowForm(false);
         handleTrackOrder(orderKey);
+        setUserName("");
       }
     } catch (error: any) {
       setStatusText(error);
@@ -40,6 +41,7 @@ export const useOrder = () => {
   };
 
   return {
+    userName,
     statusText,
     showForm,
     handleChangeName,
