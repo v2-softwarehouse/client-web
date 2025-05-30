@@ -6,11 +6,11 @@ export const Order = () => {
 
   return (
     <>
-      <h1>Fazer Pedido</h1>
+      <h1 className="text-4xl font-bold">Fazer Pedido</h1>
 
       {showForm && (
         <form>
-          <label>Seu nome:</label>
+          <label className="font-bold">Seu nome:</label>
           <input
             type="text"
             required

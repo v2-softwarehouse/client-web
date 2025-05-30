@@ -11,6 +11,7 @@ export const useOrder = () => {
       event.preventDefault();
       if (!userName.trim()) {
         setStatusText("Digite seu nome para fazer o pedido.");
+        return;
       }
 
       const orderKey = await OrderService.createOrder(userName);
