@@ -1,8 +1,6 @@
 "use client";
-import { Order, Stores } from "@/components";
+import { Order, OrderFloatButton, Stores } from "@/components";
 import { AuthService } from "@/services";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -12,25 +10,20 @@ export default function Home() {
     AuthService.signInAnonymously();
   }, []);
 
-  const handleOrder = () => {
+  const handleInitOrder = () => {
     setModalVisible(!isModalVisible);
   };
 
   return (
     <div className="p-4 h-dvh">
       <Stores />
+
       {isModalVisible && <Order />}
 
-      <div
-        className="fixed bottom-4 right-4 bg-primary p-3 rounded-3xl"
-        onClick={handleOrder}
-      >
-        {isModalVisible ? (
-          <FontAwesomeIcon icon={faTimes} className="text-secondary fa-xl" />
-        ) : (
-          <p className="font-bold text-secondary">Fazer pedido</p>
-        )}
-      </div>
+      <OrderFloatButton
+        isModalVisible={isModalVisible}
+        handleInitOrder={handleInitOrder}
+      />
 
       <div className="h-18"></div>
     </div>

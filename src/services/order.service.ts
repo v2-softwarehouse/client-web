@@ -2,7 +2,7 @@ import { DataSnapshot, onValue, push, ref, set } from "firebase/database";
 import { db } from "../../firebase";
 
 export class OrderService {
-  static createOrder = async (name: string) => {
+  static createOrder = async (name: string): Promise<string> => {
     try {
       const ordersRef = ref(db, "pedidos");
       const newOrderRef = push(ordersRef);
