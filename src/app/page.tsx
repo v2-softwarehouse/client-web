@@ -17,7 +17,7 @@ export default function Home() {
   };
 
   return (
-    <div className="p-4 pb-20">
+    <div className="p-4 pb-20 h-dvh">
       <Stores />
 
       {isModalVisible && <Order />}

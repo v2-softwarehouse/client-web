@@ -5,10 +5,18 @@ import { useEffect, useState } from "react";
 
 export const useStores = () => {
   const [stores, setStores] = useState<FoodStore[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const getStores = async () => {
-    const data = await StoresService.getStores();
-    setStores(data.lojas_de_alimentacao);
+    try {
+      const data = await StoresService.getStores();
+      setStores(data.lojas_de_alimentacao);
+    } catch (error) {
+      console.log(error);
+      alert("Erro ao carregar informações");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -17,5 +25,6 @@ export const useStores = () => {
 
   return {
     stores,
+    loading,
   };
 };
