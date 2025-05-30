@@ -7,7 +7,7 @@ type StoreCardProps = {
 
 export const StoreCard = ({ store }: StoreCardProps) => {
   return (
-    <div className="p-4 rounded-xl shadow">
+    <div className="p-4 rounded-xl shadow mb-3">
       <div className="mb-4">
         <p className="text-xs">
           {store.categoria} | {store.localizacao}
