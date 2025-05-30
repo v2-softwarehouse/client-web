@@ -7,7 +7,7 @@ export const StoreComboRaw = ({ combo }: { combo: FoodStoreCombo }) => {
   });
 
   return (
-    <div className="border-t border-primary-200 pt-3 mb-3">
+    <div className="border-t border-primary-100 pt-3 mb-3">
       <div className="flex justify-between">
         <p className="mb-1">{combo.nome}</p>
         <p className="font-bold">{price}</p>

@@ -37,8 +37,8 @@ body {
 .border-primary {
   border-color: var(--color-primary);
 }
-.border-primary-200 {
-  border-color: #50231433
+.border-primary-100 {
+  border-color: #5023141a
 }
 
 .text-secondary {
