@@ -15,17 +15,21 @@ export default function Home() {
   };
 
   return (
-    <div className="p-4 h-dvh">
-      <Stores />
+    <div className="p-4 flex justify-center">
+      <div className="w-xl">
+        <h1 className="text-2xl text-center font-bold p-3">Lojas</h1>
 
-      {isModalVisible && <Order />}
+        <Stores />
 
-      <OrderFloatButton
-        isModalVisible={isModalVisible}
-        handleInitOrder={handleInitOrder}
-      />
+        {isModalVisible && <Order />}
 
-      <div className="h-18"></div>
+        <OrderFloatButton
+          isModalVisible={isModalVisible}
+          handleInitOrder={handleInitOrder}
+        />
+
+        <div className="h-18"></div>
+      </div>
     </div>
   );
 }
