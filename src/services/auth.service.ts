@@ -1,10 +1,15 @@
-import { signInAnonymously, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInAnonymously,
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { auth } from "../../firebase";
+import { LoginRequest, UserRequest } from "@/@types";
 
 export class AuthService {
-  static errors: Record<string, string> = {
-    INVALID_LOGIN_CREDENTIALS: "Credenciais inválidas",
-  };
+  static auth = auth;
 
   static signInAnonymously = async () => {
     try {
@@ -12,10 +17,54 @@ export class AuthService {
       console.log("Login anônimo realizado com sucesso.");
     } catch (error: any) {
       console.error("Erro no login anônimo:", error.message);
+      throw error;
     }
   };
 
-  static signIn = (params: { email: string; password: string }) => {
-    return signInWithEmailAndPassword(auth, params.email, params.password);
+  static signIn = async (params: LoginRequest) => {
+    try {
+      AuthService.logOut();
+      return await signInWithEmailAndPassword(
+        auth,
+        params.email,
+        params.password
+      );
+    } catch (error: any) {
+      console.error("Erro ao fazer login:", error.message);
+      throw error;
+    }
+  };
+
+  static signUp = async (params: UserRequest) => {
+    try {
+      AuthService.logOut();
+      return await createUserWithEmailAndPassword(
+        auth,
+        params.email,
+        params.password
+      );
+    } catch (error: any) {
+      console.error("Erro ao fazer cadastro:", error.message);
+      throw error;
+    }
+  };
+
+  static passwordResetEmail = async (email: string) => {
+    try {
+      AuthService.logOut();
+      return await sendPasswordResetEmail(auth, email);
+    } catch (error: any) {
+      console.error(
+        "Erro ao enviar email de recuperação de senha:",
+        error.message
+      );
+      throw error;
+    }
+  };
+
+  static logOut = async () => {
+    if (auth.currentUser?.isAnonymous) {
+      await signOut(auth);
+    }
   };
 }

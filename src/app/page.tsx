@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const [isModalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    AuthService.signInAnonymously();
-  }, []);
+  // useEffect(() => {
+  //   AuthService.signInAnonymously();
+  // }, []);
 
   const handleInitOrder = () => {
     setModalVisible(!isModalVisible);

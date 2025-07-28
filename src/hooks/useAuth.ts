@@ -17,6 +17,30 @@ export const useAuth = () => {
     }
   };
 
+  const handleRegister = async () => {
+    try {
+      const res = await AuthService.signUp({ email, password });
+      resetForm();
+      console.log(res);
+    } catch (error: any) {
+      console.error(error);
+      setErrorMessage(error.message || "Erro ao concluir cadastro");
+    }
+  };
+
+  const handleSendPasswordResetEmail = async () => {
+    try {
+      const res = await AuthService.passwordResetEmail(email);
+      resetForm();
+      console.log(res);
+    } catch (error: any) {
+      console.error(error);
+      setErrorMessage(
+        error.message || "Erro ao enviar email de recuperação de senha"
+      );
+    }
+  };
+
   const resetForm = () => {
     setEmail("");
     setPassword("");
@@ -28,5 +52,11 @@ export const useAuth = () => {
     setPassword,
     handleLogin,
     errorMessage,
+    handleRegister,
+    handleSendPasswordResetEmail,
+    form: {
+      email,
+      password,
+    },
   };
 };

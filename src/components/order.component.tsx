@@ -2,7 +2,9 @@ import { useAuth, useOrder } from "@/hooks";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronCircleUp } from "@fortawesome/free-solid-svg-icons";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { LoginRequest, UserRequest } from "@/@types";
+import { auth } from "../../firebase";
 
 export const Order = () => {
   const {
@@ -11,30 +13,107 @@ export const Order = () => {
     handleChangeName,
     handleCreateOrder,
     userName,
+    currentRoute,
+    handleCurrentRoute,
   } = useOrder();
 
-  const { handleLogin, setEmail, setPassword, errorMessage } = useAuth();
+  const {
+    handleLogin,
+    setEmail,
+    setPassword,
+    errorMessage,
+    handleRegister,
+    handleSendPasswordResetEmail,
+    form,
+  } = useAuth();
+
+  const onLogin = async () => {
+    try {
+      await handleLogin();
+      handleCurrentRoute("order");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onRegister = async () => {
+    try {
+      await handleRegister();
+      handleCurrentRoute("order");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onSendPasswordResetEmail = async () => {
+    try {
+      await handleSendPasswordResetEmail();
+      handleCurrentRoute("login");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const routes: Record<string, { title: string; component: any }> = {
+    login: {
+      title: "Fazer login",
+      component: (
+        <LoginForm
+          errorMessage={errorMessage}
+          onLogin={onLogin}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          form={form}
+          handleCurrentRoute={handleCurrentRoute}
+        />
+      ),
+    },
+    send_password_reset_email: {
+      title: "Recuperar senha",
+      component: (
+        <SendPasswordResetEmailForm
+          errorMessage={errorMessage}
+          handleSendPasswordResetEmail={onSendPasswordResetEmail}
+          setEmail={setEmail}
+          email={form.email}
+        />
+      ),
+    },
+    register: {
+      title: "Fazer cadastro",
+      component: (
+        <RegisterForm
+          errorMessage={errorMessage}
+          handleRegister={onRegister}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          form={form}
+        />
+      ),
+    },
+    order: {
+      title: "Fazer pedido",
+      component: (
+        <>
+          <StatusText statusText={statusText} />
+          <OrderForm
+            showForm={showForm}
+            userName={userName}
+            handleChangeName={handleChangeName}
+            handleCreateOrder={handleCreateOrder}
+          />
+        </>
+      ),
+    },
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-end items-end">
       <div className="bg-secondary rounded-xl mb-18 h-[500px] w-[300px] w-max-full me-4 flex flex-col">
-        <h1 className="text-2xl text-center font-bold p-3">Fazer Pedido</h1>
-
-        <StatusText statusText={statusText} />
-
-        <LoginForm
-          errorMessage={errorMessage}
-          handleLogin={handleLogin}
-          setEmail={setEmail}
-          setPassword={setPassword}
-        />
-
-        <OrderForm
-          showForm={showForm}
-          userName={userName}
-          handleChangeName={handleChangeName}
-          handleCreateOrder={handleCreateOrder}
-        />
+        <h1 className="text-2xl text-center font-bold p-3">
+          {routes[currentRoute].title}
+        </h1>
+        {routes[currentRoute].component}
       </div>
     </div>
   );
@@ -46,7 +125,7 @@ const StatusText = ({ statusText }: { statusText: string }) => {
       <div className="h-fit w-[200px] p-2 mb-1 bg-secondary rounded">
         <p>
           {statusText ||
-            "Olá, Poderia nos informar seu nome para iniciarmos o pedido?"}
+            `Olá ${auth.currentUser?.email}, Poderia nos informar seu nome para iniciarmos o pedido?`}
         </p>
       </div>
     </div>
@@ -87,21 +166,36 @@ const LoginForm = ({
   errorMessage,
   setEmail,
   setPassword,
-  handleLogin,
+  onLogin,
+  form,
+  handleCurrentRoute,
 }: {
   errorMessage: string;
   setEmail: Dispatch<SetStateAction<string>>;
   setPassword: Dispatch<SetStateAction<string>>;
-  handleLogin: () => void;
+  onLogin: () => void;
+  form: LoginRequest;
+  handleCurrentRoute: (route: string) => void;
 }) => {
+  const onRegister = (event: any) => {
+    event.preventDefault();
+    handleCurrentRoute("register");
+  };
+
+  const onPasswordReset = (event: any) => {
+    event.preventDefault();
+    handleCurrentRoute("send_password_reset_email");
+  };
+
   return (
-    <div className="mt-auto  p-4">
+    <div className="p-4">
       <input
         required
         type="email"
         placeholder="Digite seu email"
         onChange={(e) => setEmail(e.target.value)}
         className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
+        value={form.email}
       />
 
       <input
@@ -110,12 +204,94 @@ const LoginForm = ({
         placeholder="Digite sua senha"
         onChange={(e) => setPassword(e.target.value)}
         className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
+        value={form.password}
       />
 
       <p>{errorMessage}</p>
 
-      <button type="submit" onClick={handleLogin}>
+      <button type="submit" onClick={onLogin}>
         Entrar
+      </button>
+
+      <a href="" onClick={onRegister}>
+        Cadastrar
+      </a>
+
+      <a href="" onClick={onPasswordReset}>
+        Esqueci a senha
+      </a>
+    </div>
+  );
+};
+
+const RegisterForm = ({
+  errorMessage,
+  setEmail,
+  setPassword,
+  handleRegister,
+  form,
+}: {
+  errorMessage: string;
+  setEmail: Dispatch<SetStateAction<string>>;
+  setPassword: Dispatch<SetStateAction<string>>;
+  handleRegister: () => void;
+  form: UserRequest;
+}) => {
+  return (
+    <div className="p-4">
+      <input
+        required
+        type="email"
+        placeholder="Digite seu email"
+        onChange={(e) => setEmail(e.target.value)}
+        className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
+        value={form.email}
+      />
+
+      <input
+        required
+        type="password"
+        placeholder="Digite sua senha"
+        onChange={(e) => setPassword(e.target.value)}
+        className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
+        value={form.password}
+      />
+
+      <p>{errorMessage}</p>
+
+      <button type="submit" onClick={handleRegister}>
+        Concluir
+      </button>
+    </div>
+  );
+};
+
+const SendPasswordResetEmailForm = ({
+  errorMessage,
+  setEmail,
+  handleSendPasswordResetEmail,
+  email,
+}: {
+  errorMessage: string;
+  setEmail: Dispatch<SetStateAction<string>>;
+  handleSendPasswordResetEmail: () => void;
+  email: string;
+}) => {
+  return (
+    <div className="p-4">
+      <input
+        required
+        type="email"
+        placeholder="Digite seu email"
+        onChange={(e) => setEmail(e.target.value)}
+        className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
+        value={email}
+      />
+
+      <p>{errorMessage}</p>
+
+      <button type="submit" onClick={handleSendPasswordResetEmail}>
+        Enviar
       </button>
     </div>
   );

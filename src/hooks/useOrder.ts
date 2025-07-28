@@ -1,10 +1,17 @@
 import { OrderService } from "@/services";
 import { useState } from "react";
+import { auth } from "../../firebase";
 
 export const useOrder = () => {
   const [statusText, setStatusText] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
-  const [showForm, setShowForm] = useState<boolean>(false);
+  const [showForm, setShowForm] = useState<boolean>(true);
+
+  const [currentRoute, setCurrentRoute] = useState(
+    auth.currentUser ? "order" : "login"
+  );
+
+  const handleCurrentRoute = (route: string) => setCurrentRoute(route);
 
   const handleCreateOrder = async (event: any) => {
     try {
@@ -46,5 +53,7 @@ export const useOrder = () => {
     showForm,
     handleChangeName,
     handleCreateOrder,
+    currentRoute,
+    handleCurrentRoute,
   };
 };
