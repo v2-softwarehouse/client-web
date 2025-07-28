@@ -4,7 +4,7 @@ import { useState } from "react";
 export const useOrder = () => {
   const [statusText, setStatusText] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
-  const [showForm, setShowForm] = useState<boolean>(true);
+  const [showForm, setShowForm] = useState<boolean>(false);
 
   const handleCreateOrder = async (event: any) => {
     try {
