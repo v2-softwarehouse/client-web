@@ -1,10 +1,8 @@
 import { useAuth, useOrder } from "@/hooks";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronCircleUp } from "@fortawesome/free-solid-svg-icons";
-import { Dispatch, SetStateAction, useState } from "react";
-import { LoginRequest, UserRequest } from "@/@types";
-import { auth } from "../../firebase";
+import { LoginForm } from "./login-form";
+import { OrderForm } from "./order-form.component";
+import { RegisterForm } from "./register-form";
+import { SendPasswordResetEmailForm } from "./send-password-reset-email-form";
 
 export const Order = () => {
   const {
@@ -67,11 +65,11 @@ export const Order = () => {
 
   const routes: Record<string, { title: string; component: any }> = {
     login: {
-      title: "Fazer login",
+      title: "Login",
       component: (
         <LoginForm
           errorMessage={errorMessage}
-          onLogin={onLogin}
+          handleLogin={onLogin}
           setEmail={setEmail}
           setPassword={setPassword}
           form={form}
@@ -92,7 +90,7 @@ export const Order = () => {
       ),
     },
     register: {
-      title: "Fazer cadastro",
+      title: "Cadastrar",
       component: (
         <RegisterForm
           errorMessage={errorMessage}
@@ -127,212 +125,6 @@ export const Order = () => {
         </h1>
         {routes[currentRoute].component}
       </div>
-    </div>
-  );
-};
-
-const OrderForm = ({
-  showForm,
-  userName,
-  statusText,
-  handleChangeName,
-  handleCreateOrder,
-  onLogout,
-}: {
-  showForm: boolean;
-  userName: string;
-  statusText: string;
-  handleChangeName: (value: string) => void;
-  handleCreateOrder: (event: any) => void;
-  onLogout: (event: any) => void;
-}) => {
-  return (
-    <>
-      <div className="flex bg-white h-full flex-col p-2">
-        <p>{`Logado como: ${auth.currentUser?.email}`}</p>
-        <a href="" onClick={onLogout}>
-          Encerrar sessão?
-        </a>
-
-        <div className="h-fit w-[200px] p-2 mb-1 bg-secondary rounded">
-          <p>
-            {statusText ||
-              `Olá, poderia nos informar seu nome para iniciarmos o pedido?`}
-          </p>
-        </div>
-      </div>
-      <form className="mt-auto flex p-4">
-        <input
-          className="bg-white rounded w-full me-2 h-8 p-1"
-          type="text"
-          required
-          disabled={!showForm}
-          value={userName}
-          placeholder="Digite..."
-          onChange={(e) => handleChangeName(e.target.value)}
-        />
-
-        <button type="submit" onClick={handleCreateOrder} disabled={!showForm}>
-          <FontAwesomeIcon icon={faChevronCircleUp} className="fa-xl" />
-        </button>
-      </form>
-    </>
-  );
-};
-
-const LoginForm = ({
-  errorMessage,
-  setEmail,
-  setPassword,
-  onLogin,
-  form,
-  handleCurrentRoute,
-}: {
-  errorMessage: string;
-  setEmail: Dispatch<SetStateAction<string>>;
-  setPassword: Dispatch<SetStateAction<string>>;
-  onLogin: () => void;
-  form: LoginRequest;
-  handleCurrentRoute: (route: string) => void;
-}) => {
-  const onRegister = (event: any) => {
-    event.preventDefault();
-    handleCurrentRoute("register");
-  };
-
-  const onPasswordReset = (event: any) => {
-    event.preventDefault();
-    handleCurrentRoute("send_password_reset_email");
-  };
-
-  return (
-    <div className="p-4">
-      <input
-        required
-        type="email"
-        placeholder="Digite seu email"
-        onChange={(e) => setEmail(e.target.value)}
-        className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
-        value={form.email}
-      />
-
-      <input
-        required
-        type="password"
-        placeholder="Digite sua senha"
-        onChange={(e) => setPassword(e.target.value)}
-        className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
-        value={form.password}
-      />
-
-      <p>{errorMessage}</p>
-
-      <button type="submit" onClick={onLogin}>
-        Entrar
-      </button>
-
-      <a href="" onClick={onRegister}>
-        Cadastrar
-      </a>
-
-      <a href="" onClick={onPasswordReset}>
-        Esqueci a senha
-      </a>
-    </div>
-  );
-};
-
-const RegisterForm = ({
-  errorMessage,
-  setEmail,
-  setPassword,
-  handleRegister,
-  form,
-  handleCurrentRoute,
-}: {
-  errorMessage: string;
-  setEmail: Dispatch<SetStateAction<string>>;
-  setPassword: Dispatch<SetStateAction<string>>;
-  handleRegister: () => void;
-  form: UserRequest;
-  handleCurrentRoute: (route: string) => void;
-}) => {
-  const onRegister = (event: any) => {
-    event.preventDefault();
-    handleRegister();
-  };
-
-  const onLogin = (event: any) => {
-    event.preventDefault();
-    handleCurrentRoute("login");
-  };
-
-  return (
-    <form className="p-4">
-      <input
-        required
-        type="email"
-        placeholder="Digite seu email"
-        onChange={(e) => setEmail(e.target.value)}
-        className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
-        value={form.email}
-      />
-
-      <input
-        required
-        type="password"
-        placeholder="Digite sua senha"
-        onChange={(e) => setPassword(e.target.value)}
-        className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
-        value={form.password}
-      />
-
-      <p>{errorMessage}</p>
-
-      <button onClick={onLogin}>Voltar</button>
-
-      <button type="submit" onClick={onRegister}>
-        Concluir
-      </button>
-    </form>
-  );
-};
-
-const SendPasswordResetEmailForm = ({
-  errorMessage,
-  setEmail,
-  handleSendPasswordResetEmail,
-  email,
-  handleCurrentRoute,
-}: {
-  errorMessage: string;
-  setEmail: Dispatch<SetStateAction<string>>;
-  handleSendPasswordResetEmail: () => void;
-  email: string;
-  handleCurrentRoute: (route: string) => void;
-}) => {
-  const onLogin = (event: any) => {
-    event.preventDefault();
-    handleCurrentRoute("login");
-  };
-  return (
-    <div className="p-4">
-      <input
-        required
-        type="email"
-        placeholder="Digite seu email"
-        onChange={(e) => setEmail(e.target.value)}
-        className="bg-white rounded w-full me-2 h-8 p-1 mb-2"
-        value={email}
-      />
-
-      <p>{errorMessage}</p>
-
-      <button onClick={onLogin}>Voltar</button>
-
-      <button type="submit" onClick={handleSendPasswordResetEmail}>
-        Enviar
-      </button>
     </div>
   );
 };

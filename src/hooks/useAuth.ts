@@ -9,17 +9,18 @@ export const useAuth = () => {
 
   const handleLogin = async () => {
     try {
+      setErrorMessage("");
       const res = await AuthService.signIn({ email, password });
       resetForm();
-      console.log(res);
     } catch (error: any) {
-      console.error(error);
       setErrorMessage("Credenciais inválidas");
+      throw error;
     }
   };
 
   const handleRegister = async () => {
     try {
+      setErrorMessage("");
       const res = await AuthService.signUp({ email, password });
       resetForm();
       console.log(res);
@@ -31,6 +32,7 @@ export const useAuth = () => {
 
   const handleSendPasswordResetEmail = async () => {
     try {
+      setErrorMessage("");
       const res = await AuthService.passwordResetEmail(email);
       resetForm();
       console.log(res);
