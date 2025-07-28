@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AuthService } from "@/services";
+import { auth } from "../../firebase";
 
 export const useAuth = () => {
   const [email, setEmail] = useState<string>("");
@@ -47,6 +48,15 @@ export const useAuth = () => {
     setErrorMessage("");
   };
 
+  const handleLogout = async () => {
+    try {
+      const res = await AuthService.logOut();
+      console.log(res);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
   return {
     setEmail,
     setPassword,
@@ -54,6 +64,7 @@ export const useAuth = () => {
     errorMessage,
     handleRegister,
     handleSendPasswordResetEmail,
+    handleLogout,
     form: {
       email,
       password,

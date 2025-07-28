@@ -63,8 +63,13 @@ export class AuthService {
   };
 
   static logOut = async () => {
-    if (auth.currentUser?.isAnonymous) {
-      await signOut(auth);
+    try {
+      if (auth.currentUser) {
+        await signOut(auth);
+      }
+    } catch (error: any) {
+      console.error("Erro ao fazer logout:", error.message);
+      throw error;
     }
   };
 }

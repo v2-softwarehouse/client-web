@@ -9,22 +9,23 @@ import { auth } from "../../firebase";
 export const Order = () => {
   const {
     showForm,
+    userName,
     statusText,
+    currentRoute,
     handleChangeName,
     handleCreateOrder,
-    userName,
-    currentRoute,
     handleCurrentRoute,
   } = useOrder();
 
   const {
-    handleLogin,
+    form,
+    errorMessage,
     setEmail,
     setPassword,
-    errorMessage,
+    handleLogin,
+    handleLogout,
     handleRegister,
     handleSendPasswordResetEmail,
-    form,
   } = useAuth();
 
   const onLogin = async () => {
@@ -54,6 +55,16 @@ export const Order = () => {
     }
   };
 
+  const onLogout = async (event: any) => {
+    try {
+      event.preventDefault();
+      await handleLogout();
+      handleCurrentRoute("login");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const routes: Record<string, { title: string; component: any }> = {
     login: {
       title: "Fazer login",
@@ -72,6 +83,7 @@ export const Order = () => {
       title: "Recuperar senha",
       component: (
         <SendPasswordResetEmailForm
+          handleCurrentRoute={handleCurrentRoute}
           errorMessage={errorMessage}
           handleSendPasswordResetEmail={onSendPasswordResetEmail}
           setEmail={setEmail}
@@ -88,21 +100,21 @@ export const Order = () => {
           setEmail={setEmail}
           setPassword={setPassword}
           form={form}
+          handleCurrentRoute={handleCurrentRoute}
         />
       ),
     },
     order: {
       title: "Fazer pedido",
       component: (
-        <>
-          <StatusText statusText={statusText} />
-          <OrderForm
-            showForm={showForm}
-            userName={userName}
-            handleChangeName={handleChangeName}
-            handleCreateOrder={handleCreateOrder}
-          />
-        </>
+        <OrderForm
+          onLogout={onLogout}
+          statusText={statusText}
+          showForm={showForm}
+          userName={userName}
+          handleChangeName={handleChangeName}
+          handleCreateOrder={handleCreateOrder}
+        />
       ),
     },
   };
@@ -119,46 +131,52 @@ export const Order = () => {
   );
 };
 
-const StatusText = ({ statusText }: { statusText: string }) => {
-  return (
-    <div className="flex bg-white h-full flex-col p-2">
-      <div className="h-fit w-[200px] p-2 mb-1 bg-secondary rounded">
-        <p>
-          {statusText ||
-            `Olá ${auth.currentUser?.email}, Poderia nos informar seu nome para iniciarmos o pedido?`}
-        </p>
-      </div>
-    </div>
-  );
-};
-
 const OrderForm = ({
   showForm,
   userName,
+  statusText,
   handleChangeName,
   handleCreateOrder,
+  onLogout,
 }: {
   showForm: boolean;
   userName: string;
+  statusText: string;
   handleChangeName: (value: string) => void;
   handleCreateOrder: (event: any) => void;
+  onLogout: (event: any) => void;
 }) => {
   return (
-    <form className="mt-auto flex p-4">
-      <input
-        className="bg-white rounded w-full me-2 h-8 p-1"
-        type="text"
-        required
-        disabled={!showForm}
-        value={userName}
-        placeholder="Digite..."
-        onChange={(e) => handleChangeName(e.target.value)}
-      />
+    <>
+      <div className="flex bg-white h-full flex-col p-2">
+        <p>{`Logado como: ${auth.currentUser?.email}`}</p>
+        <a href="" onClick={onLogout}>
+          Encerrar sessão?
+        </a>
 
-      <button type="submit" onClick={handleCreateOrder} disabled={!showForm}>
-        <FontAwesomeIcon icon={faChevronCircleUp} className="fa-xl" />
-      </button>
-    </form>
+        <div className="h-fit w-[200px] p-2 mb-1 bg-secondary rounded">
+          <p>
+            {statusText ||
+              `Olá, poderia nos informar seu nome para iniciarmos o pedido?`}
+          </p>
+        </div>
+      </div>
+      <form className="mt-auto flex p-4">
+        <input
+          className="bg-white rounded w-full me-2 h-8 p-1"
+          type="text"
+          required
+          disabled={!showForm}
+          value={userName}
+          placeholder="Digite..."
+          onChange={(e) => handleChangeName(e.target.value)}
+        />
+
+        <button type="submit" onClick={handleCreateOrder} disabled={!showForm}>
+          <FontAwesomeIcon icon={faChevronCircleUp} className="fa-xl" />
+        </button>
+      </form>
+    </>
   );
 };
 
@@ -230,15 +248,27 @@ const RegisterForm = ({
   setPassword,
   handleRegister,
   form,
+  handleCurrentRoute,
 }: {
   errorMessage: string;
   setEmail: Dispatch<SetStateAction<string>>;
   setPassword: Dispatch<SetStateAction<string>>;
   handleRegister: () => void;
   form: UserRequest;
+  handleCurrentRoute: (route: string) => void;
 }) => {
+  const onRegister = (event: any) => {
+    event.preventDefault();
+    handleRegister();
+  };
+
+  const onLogin = (event: any) => {
+    event.preventDefault();
+    handleCurrentRoute("login");
+  };
+
   return (
-    <div className="p-4">
+    <form className="p-4">
       <input
         required
         type="email"
@@ -259,10 +289,12 @@ const RegisterForm = ({
 
       <p>{errorMessage}</p>
 
-      <button type="submit" onClick={handleRegister}>
+      <button onClick={onLogin}>Voltar</button>
+
+      <button type="submit" onClick={onRegister}>
         Concluir
       </button>
-    </div>
+    </form>
   );
 };
 
@@ -271,12 +303,18 @@ const SendPasswordResetEmailForm = ({
   setEmail,
   handleSendPasswordResetEmail,
   email,
+  handleCurrentRoute,
 }: {
   errorMessage: string;
   setEmail: Dispatch<SetStateAction<string>>;
   handleSendPasswordResetEmail: () => void;
   email: string;
+  handleCurrentRoute: (route: string) => void;
 }) => {
+  const onLogin = (event: any) => {
+    event.preventDefault();
+    handleCurrentRoute("login");
+  };
   return (
     <div className="p-4">
       <input
@@ -289,6 +327,8 @@ const SendPasswordResetEmailForm = ({
       />
 
       <p>{errorMessage}</p>
+
+      <button onClick={onLogin}>Voltar</button>
 
       <button type="submit" onClick={handleSendPasswordResetEmail}>
         Enviar
